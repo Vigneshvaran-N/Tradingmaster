@@ -42,22 +42,28 @@ body {
   --tv-green: #26a69a;
   --tv-red: #ef5350;
   --tv-yellow: #f0b90b;
+  --tv-overlay-bg: rgba(19, 23, 34, 0.88);
+  --tv-badge-bg: #312e81;
+  --tv-badge-text: #c7d2fe;
   background: var(--tv-bg);
   color: var(--tv-text);
 }
 
 .theme-light {
   --tv-bg: #ffffff;
-  --tv-surface: #f0f3fa;
-  --tv-surface-hover: #e0e3eb;
+  --tv-surface: #ffffff;
+  --tv-surface-hover: #f0f3fa;
   --tv-surface-active: #2962ff;
   --tv-border: #e0e3eb;
   --tv-text: #131722;
   --tv-text-muted: #787b86;
   --tv-accent: #2962ff;
-  --tv-green: #26a69a;
-  --tv-red: #ef5350;
+  --tv-green: #089981;
+  --tv-red: #f23645;
   --tv-yellow: #f0b90b;
+  --tv-overlay-bg: rgba(255, 255, 255, 0.94);
+  --tv-badge-bg: #e0e7ff;
+  --tv-badge-text: #3730a3;
   background: var(--tv-bg);
   color: var(--tv-text);
 }
@@ -143,7 +149,7 @@ body {
   font-weight: 600;
   padding: 1px 4px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--tv-surface-hover);
   color: var(--tv-text-muted);
 }
 
@@ -182,7 +188,13 @@ body {
   border: 1px solid var(--tv-accent);
 }
 
-/* Timeframes list */
+/* Timeframes Section & Dropdown Menu */
+.tv-tf-section {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .tv-tf-list {
   display: flex;
   align-items: center;
@@ -210,6 +222,167 @@ body {
 .tv-tf-btn.active {
   color: var(--tv-accent);
   background: rgba(41, 98, 255, 0.12);
+}
+
+.tv-tf-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--tv-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.tv-tf-dropdown-btn:hover,
+.tv-tf-dropdown-btn.active {
+  background: var(--tv-surface-hover);
+  color: var(--tv-accent);
+}
+
+.tv-tf-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: var(--tv-surface);
+  border: 1px solid var(--tv-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  padding: 6px 0;
+  min-width: 220px;
+  max-height: 480px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.tv-tf-custom-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--tv-text);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.tv-tf-custom-item:hover {
+  background: var(--tv-surface-hover);
+}
+
+.tv-tf-menu-divider {
+  height: 1px;
+  background: var(--tv-border);
+  margin: 4px 0;
+}
+
+.tv-tf-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.tv-tf-group-header {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--tv-text-muted);
+  padding: 10px 16px 4px;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tv-tf-group-header:hover {
+  color: var(--tv-text);
+}
+
+.tv-tf-category-chevron {
+  font-size: 10px;
+  transition: transform 0.15s ease;
+  display: inline-block;
+}
+
+.tv-tf-category-chevron.collapsed {
+  transform: rotate(180deg);
+}
+
+.tv-tf-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 16px;
+  font-size: 13px;
+  color: var(--tv-text);
+  cursor: pointer;
+  transition: background 0.12s ease;
+  margin: 1px 4px;
+  border-radius: 4px;
+}
+
+.tv-tf-menu-item:hover {
+  background: var(--tv-surface-hover);
+}
+
+.tv-tf-menu-item.active {
+  background: #2a2e39;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.light-theme .tv-tf-menu-item.active {
+  background: #e0e3eb;
+  color: #131722;
+}
+
+.tv-tf-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tv-tf-check-mark {
+  width: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--tv-accent);
+}
+
+.tv-tf-item-label {
+  font-size: 13px;
+}
+
+.tv-tf-star-btn {
+  background: transparent;
+  border: none;
+  color: var(--tv-text-muted);
+  padding: 2px 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  opacity: 0.4;
+  transition: opacity 0.12s, color 0.12s;
+}
+
+.tv-tf-menu-item:hover .tv-tf-star-btn {
+  opacity: 1;
+}
+
+.tv-tf-star-btn.active-star {
+  opacity: 1;
+  color: var(--tv-yellow);
 }
 
 /* Topbar right items */
@@ -249,16 +422,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #1b202e;
-  border-bottom: 1px solid #2962ff;
+  background: var(--tv-surface);
+  border-bottom: 1px solid var(--tv-accent);
   padding: 4px 14px;
   font-size: 12px;
-  color: #ffffff;
+  color: var(--tv-text);
   z-index: 19;
 }
 .tv-replay-title {
   font-weight: 700;
-  color: #2962ff;
+  color: var(--tv-accent);
 }
 .tv-replay-actions {
   display: flex;
@@ -266,17 +439,19 @@ body {
   gap: 10px;
 }
 .tv-replay-btn {
-  background: #2a2e39;
-  border: 1px solid #363a45;
-  color: white;
+  background: var(--tv-surface-hover);
+  border: 1px solid var(--tv-border);
+  color: var(--tv-text);
   padding: 4px 10px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
+  transition: background 0.12s, color 0.12s;
 }
 .tv-replay-btn.active {
-  background: #2962ff;
-  border-color: #2962ff;
+  background: var(--tv-accent);
+  border-color: var(--tv-accent);
+  color: white;
 }
 .tv-replay-speed {
   display: flex;
@@ -284,21 +459,21 @@ body {
   gap: 4px;
 }
 .tv-replay-speed select {
-  background: #2a2e39;
-  color: white;
-  border: 1px solid #363a45;
+  background: var(--tv-surface-hover);
+  color: var(--tv-text);
+  border: 1px solid var(--tv-border);
   border-radius: 3px;
   padding: 2px 4px;
 }
 .tv-replay-close-btn {
   background: transparent;
   border: none;
-  color: #787b86;
+  color: var(--tv-text-muted);
   font-size: 14px;
   cursor: pointer;
 }
 .tv-replay-close-btn:hover {
-  color: white;
+  color: var(--tv-text);
 }
 
 /* Dropdown menus */
@@ -357,8 +532,8 @@ body {
    3. Left Side Helper Toolbar (TradingView Drawing Suite)
    ========================================================================== */
 .tv-sidetoolbar {
-  width: 48px;
-  min-width: 48px;
+  width: 52px;
+  min-width: 52px;
   background: var(--tv-surface);
   border-right: 1px solid var(--tv-border);
   display: flex;
@@ -372,12 +547,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   width: 100%;
 }
 
 .tv-side-divider {
-  width: 26px;
+  width: 30px;
   height: 1px;
   background: var(--tv-border);
   margin: 6px 0;
@@ -395,8 +570,8 @@ body {
 }
 
 .tv-tool-btn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 4px;
   border: none;
   background: transparent;
@@ -407,6 +582,11 @@ body {
   cursor: pointer;
   position: relative;
   transition: background 0.12s, color 0.12s;
+}
+
+.tv-tool-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 .tv-tool-btn:hover {
@@ -440,9 +620,9 @@ body {
 /* Tiny arrow indicating flyout submenu */
 .tv-sub-arrow {
   position: absolute;
-  right: 1px;
-  bottom: 1px;
-  font-size: 6px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 7px;
   color: var(--tv-text-muted);
   pointer-events: auto;
 }
@@ -595,15 +775,16 @@ body {
   font-size: 13px;
   font-weight: 700;
   color: var(--tv-text);
-  background: rgba(19, 23, 34, 0.7);
+  background: var(--tv-overlay-bg);
+  border: 1px solid var(--tv-border);
   padding: 3px 8px;
   border-radius: 4px;
   backdrop-filter: blur(4px);
 }
 
 .tv-badge-index {
-  background: #312e81;
-  color: #c7d2fe;
+  background: var(--tv-badge-bg);
+  color: var(--tv-badge-text);
   font-size: 11px;
   font-weight: 800;
   padding: 1px 5px;
@@ -642,7 +823,8 @@ body {
   gap: 10px;
   font-size: 12px;
   font-family: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif;
-  background: rgba(19, 23, 34, 0.7);
+  background: var(--tv-overlay-bg);
+  border: 1px solid var(--tv-border);
   padding: 3px 8px;
   border-radius: 4px;
   backdrop-filter: blur(4px);
@@ -681,11 +863,11 @@ body {
 .tv-quick-trade-widget {
   display: flex;
   align-items: stretch;
-  background: #1e222d;
-  border: 1px solid #2a2e39;
+  background: var(--tv-surface);
+  border: 1px solid var(--tv-border);
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 .tv-trade-btn {
@@ -706,21 +888,21 @@ body {
 
 .tv-trade-btn.sell {
   background: rgba(239, 83, 80, 0.12);
-  border-right: 1px solid #2a2e39;
-  color: #ef5350;
+  border-right: 1px solid var(--tv-border);
+  color: var(--tv-red);
 }
 .tv-trade-btn.sell:hover {
-  background: #ef5350;
+  background: var(--tv-red);
   color: #ffffff;
 }
 
 .tv-trade-btn.buy {
   background: rgba(41, 98, 255, 0.12);
-  border-left: 1px solid #2a2e39;
-  color: #2962ff;
+  border-left: 1px solid var(--tv-border);
+  color: var(--tv-accent);
 }
 .tv-trade-btn.buy:hover {
-  background: #2962ff;
+  background: var(--tv-accent);
   color: #ffffff;
 }
 
@@ -743,17 +925,17 @@ body {
   align-items: center;
   justify-content: center;
   padding: 4px 8px;
-  background: #181b24;
+  background: var(--tv-surface-hover);
   gap: 2px;
 }
 
 .tv-trade-qty-input {
   width: 50px;
   text-align: center;
-  background: #2a2e39;
-  border: 1px solid #363a45;
+  background: var(--tv-surface);
+  border: 1px solid var(--tv-border);
   border-radius: 3px;
-  color: white;
+  color: var(--tv-text);
   font-size: 11px;
   font-weight: 700;
   padding: 2px;
@@ -765,6 +947,13 @@ body {
 }
 
 /* Row 3: Active Indicators Badges */
+.tv-overlay-indicators-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
 .tv-overlay-indicators-row {
   display: flex;
   align-items: center;
@@ -776,33 +965,43 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(30, 34, 45, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+  background: var(--tv-surface);
+  border: 1px solid var(--tv-border);
+  border-radius: 5px;
   padding: 2px 8px;
-  font-size: 11px;
-  backdrop-filter: blur(4px);
+  font-size: 12px;
+  height: 24px;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.tv-indicator-badge:hover,
+.tv-indicator-badge:focus-within {
+  border-color: #2962ff;
+  box-shadow: 0 0 0 1px rgba(41, 98, 255, 0.4);
+  background: var(--tv-surface-hover);
 }
 
 .tv-indicator-badge.dimmed {
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
 .tv-ind-name {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--tv-text);
+  font-size: 12px;
 }
 
 .tv-ind-val {
-  color: #26a69a;
-  font-weight: 600;
+  color: var(--tv-text-muted);
+  font-size: 12px;
 }
 
 .tv-ind-controls {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 4px;
+  gap: 2px;
+  margin-left: 2px;
 }
 
 .tv-ind-btn {
@@ -810,13 +1009,42 @@ body {
   border: none;
   color: var(--tv-text-muted);
   cursor: pointer;
-  padding: 1px 2px;
+  padding: 3px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
-  font-size: 11px;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
 }
+
 .tv-ind-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
   color: var(--tv-text);
+}
+
+.light-theme .tv-ind-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.tv-ind-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--tv-surface);
+  border: 1px solid var(--tv-border);
+  border-radius: 4px;
+  color: var(--tv-text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.tv-ind-collapse-btn:hover {
+  background: var(--tv-surface-hover);
+  color: var(--tv-text);
+  border-color: var(--tv-accent);
 }
 
 /* Floating Favorites Toolbar */
@@ -877,8 +1105,8 @@ body {
    5. Right Action Rail & Expandable Panels
    ========================================================================== */
 .tv-right-rail {
-  width: 42px;
-  min-width: 42px;
+  width: 52px;
+  min-width: 52px;
   background: var(--tv-surface);
   border-left: 1px solid var(--tv-border);
   display: flex;
@@ -890,8 +1118,8 @@ body {
 }
 
 .tv-rail-btn {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -901,6 +1129,11 @@ body {
   color: var(--tv-text-muted);
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
+}
+
+.tv-rail-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 .tv-rail-btn:hover {
@@ -1284,14 +1517,18 @@ body {
 
 .tv-pine-textarea {
   flex: 1;
-  background: #11141d;
-  color: #a5d6a7;
+  background: var(--tv-bg);
+  color: var(--tv-text);
   font-family: "Fira Code", monospace;
   font-size: 12px;
   padding: 12px;
   border: none;
   resize: none;
   outline: none;
+}
+.theme-light .tv-pine-textarea {
+  background: #f8fafc;
+  color: #0f172a;
 }
 
 /* Screener table */
@@ -1495,86 +1732,284 @@ body {
 }
 
 /* Indicators modal */
-.indicators-modal {
-  width: 680px;
-}
-
-.tv-indicators-body {
+/* TradingView Indicators Modal Main */
+.tv-indicators-modal-main {
+  width: 860px;
+  max-width: 92vw;
+  height: 580px;
+  max-height: 85vh;
   display: flex;
-  height: 420px;
+  flex-direction: column;
+  background: var(--tv-surface);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  padding: 0;
 }
 
-.tv-ind-categories {
-  width: 180px;
+.tv-ind-modal-top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+}
+
+.tv-ind-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--tv-text);
+  margin: 0;
+}
+
+.tv-ind-search-wrapper {
+  position: relative;
+  margin: 0 20px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.tv-ind-search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--tv-text-muted);
+  pointer-events: none;
+}
+
+.tv-ind-search-input {
+  width: 100%;
+  height: 38px;
+  background: transparent;
+  border: 1px solid var(--tv-border);
+  border-radius: 8px;
+  padding: 0 12px 0 38px;
+  font-size: 14px;
+  color: var(--tv-text);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.tv-ind-search-input:focus {
+  border-color: var(--tv-accent);
+}
+
+.tv-ind-modal-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border-top: 1px solid var(--tv-border);
+}
+
+/* Left Sidebar Nav */
+.tv-ind-sidebar-nav {
+  width: 210px;
   border-right: 1px solid var(--tv-border);
-  padding: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  user-select: none;
+}
+
+.tv-ind-sidebar-section {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.tv-ind-cat-btn {
-  text-align: left;
-  background: transparent;
-  border: none;
-  border-radius: 4px;
+.tv-ind-sidebar-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
   color: var(--tv-text-muted);
-  padding: 8px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
+  text-transform: uppercase;
+  padding: 4px 8px;
 }
 
-.tv-ind-cat-btn:hover {
+.tv-ind-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tv-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.tv-ind-sidebar-item:hover {
+  background: var(--tv-surface-hover);
+}
+
+.tv-ind-sidebar-item.active {
+  background: #2a2e39;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.light-theme .tv-ind-sidebar-item.active {
+  background: #e0e3eb;
+  color: #131722;
+}
+
+.tv-ind-sidebar-icon {
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+}
+
+/* Right Main Script Area */
+.tv-ind-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 20px;
+  overflow: hidden;
+}
+
+.tv-ind-filter-pills-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+
+.tv-ind-filter-pill {
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tv-text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+
+.tv-ind-filter-pill:hover {
   background: var(--tv-surface-hover);
   color: var(--tv-text);
 }
 
-.tv-ind-cat-btn.active {
-  background: rgba(41, 98, 255, 0.15);
-  color: var(--tv-accent);
+.tv-ind-filter-pill.active {
+  background: #2a2e39;
+  color: #ffffff;
+  font-weight: 600;
 }
 
-.tv-ind-list {
+.light-theme .tv-ind-filter-pill.active {
+  background: #292a2d;
+  color: #ffffff;
+}
+
+.tv-ind-table-header {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--tv-text-muted);
+  text-transform: uppercase;
+  padding: 6px 0 8px;
+  border-bottom: 1px solid var(--tv-border);
+  margin-bottom: 4px;
+}
+
+.tv-ind-script-list {
   flex: 1;
   overflow-y: auto;
-  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
 }
 
-.tv-ind-row {
+.tv-ind-script-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--tv-border);
+  padding: 9px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s ease;
 }
 
-.tv-ind-title {
-  font-weight: 700;
+.tv-ind-script-row:hover {
+  background: var(--tv-surface-hover);
+}
+
+.tv-ind-script-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tv-ind-script-name {
   font-size: 13px;
-  display: block;
+  font-weight: 500;
+  color: var(--tv-text);
 }
 
-.tv-ind-pane-tag {
-  font-size: 10px;
+.tv-ind-beta-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--tv-text-muted);
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.light-theme .tv-ind-beta-badge {
+  background: #e0e3eb;
+  color: #434651;
+}
+
+.tv-ind-script-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tv-ind-script-pane {
+  font-size: 11px;
   color: var(--tv-text-muted);
 }
 
-.tv-ind-add-btn {
-  background: #2a2e39;
-  border: 1px solid #363a45;
-  color: white;
+.tv-ind-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--tv-border);
   border-radius: 4px;
-  padding: 5px 12px;
-  font-size: 11px;
+  padding: 3px 10px;
+  font-size: 12px;
   font-weight: 600;
+  color: var(--tv-text);
   cursor: pointer;
+  transition: all 0.12s ease;
 }
 
-.tv-ind-add-btn.active {
-  background: rgba(239, 83, 80, 0.18);
-  border-color: #ef5350;
-  color: #ef5350;
+.tv-ind-toggle-btn:hover {
+  border-color: var(--tv-accent);
+  color: var(--tv-accent);
+}
+
+.tv-ind-toggle-btn.active {
+  background: rgba(41, 98, 255, 0.14);
+  border-color: var(--tv-accent);
+  color: var(--tv-accent);
+}
+
+.tv-ind-empty-state {
+  padding: 30px 10px;
+  text-align: center;
+  color: var(--tv-text-muted);
+  font-size: 13px;
 }
 
 /* Settings modal layout */
@@ -1818,7 +2253,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #181b24;
+  background: var(--tv-surface-hover);
   border-bottom: 1px solid var(--tv-border);
   animation: fadeIn 0.12s ease;
 }
@@ -1854,7 +2289,7 @@ body {
   text-transform: uppercase;
   color: var(--tv-text-muted);
   letter-spacing: 0.5px;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--tv-surface-hover);
 }
 
 .tv-wl-col.symbol {
@@ -1874,7 +2309,7 @@ body {
 
 /* Section Header (Matches user screenshot: ⌄ INDICES / ⌄ STOCKS) */
 .tv-wl-group-section {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--tv-border);
 }
 
 .tv-wl-section-header {
@@ -1882,7 +2317,7 @@ body {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--tv-surface-hover);
   font-size: 10px;
   font-weight: 800;
   color: var(--tv-text-muted);
@@ -1918,8 +2353,8 @@ body {
   display: grid;
   grid-template-columns: 2.2fr 1.2fr 1fr 1.3fr;
   align-items: center;
-  padding: 6px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--tv-border);
   cursor: pointer;
   position: relative;
   transition: background 0.1s;
@@ -1943,14 +2378,14 @@ body {
 
 /* Circular Logo Badges (Matches user screenshot) */
 .tv-sym-logo {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   color: #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -2228,7 +2663,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 4px 10px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--tv-surface-hover);
   cursor: pointer;
   gap: 2px;
   user-select: none;
@@ -2296,63 +2731,182 @@ body {
   margin-top: 1px;
 }
 
-/* Big price and change readout */
-.tv-wl-details-price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.tv-wl-big-price {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--tv-text);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.5px;
-}
-
-.tv-wl-big-change {
+/* Dual-Tone Price Display & Market Badges */
+.tv-dual-price {
+  font-family: -apple-system, BlinkMacSystemFont, "Trebuchet MS", "Inter", Roboto, sans-serif;
+  font-weight: 600;
   font-size: 13px;
-  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.tv-wl-big-change.up { color: var(--tv-green); }
-.tv-wl-big-change.down { color: var(--tv-red); }
 
-/* Day Range Bar */
-.tv-wl-range-section {
+.tv-price-int {
+  color: var(--tv-text);
+  font-weight: 600;
+}
+
+.tv-price-dec {
+  font-weight: 600;
+  font-size: 12px;
+}
+.tv-price-dec.up { color: #089981; }
+.tv-price-dec.down { color: #f23645; }
+
+.tv-market-d-badge {
+  font-size: 9px;
+  font-weight: 800;
+  color: #ff9800;
+  margin-left: 3px;
+  vertical-align: super;
+  line-height: 0;
+}
+
+/* Big price and change readout matching screenshot */
+.tv-wl-details-price-row {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.tv-wl-range-labels {
+.tv-wl-big-price-container {
   display: flex;
-  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.tv-wl-big-price {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--tv-text);
+  font-family: "Trebuchet MS", -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
+  letter-spacing: -0.8px;
+}
+
+.tv-wl-point-badge {
   font-size: 10px;
+  font-weight: 800;
+  color: #ff9800;
+  letter-spacing: 0.4px;
+}
+
+.tv-wl-big-change-line {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.tv-wl-big-change-line.up { color: #089981; }
+.tv-wl-big-change-line.down { color: #f23645; }
+
+.tv-wl-market-status-line {
+  font-size: 12px;
+  color: #089981;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.tv-market-open-dot {
+  font-size: 10px;
+  color: #089981;
+}
+
+/* News Snippet Card */
+.tv-wl-news-card {
+  background: #f0f3fa;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.theme-dark .tv-wl-news-card {
+  background: #1e222d;
+  border: 1px solid #2a2e39;
+}
+
+.tv-wl-news-header {
+  font-size: 11px;
   color: var(--tv-text-muted);
 }
-.tv-wl-range-labels b {
+.tv-wl-news-header b {
   color: var(--tv-text);
 }
-.range-title {
+
+.tv-wl-news-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--tv-text);
+  line-height: 1.4;
+}
+
+.tv-wl-news-more {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--tv-accent);
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+/* Performance Section Grid */
+.tv-wl-performance-section {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tv-wl-perf-title {
+  font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  color: var(--tv-text);
 }
 
-.tv-wl-range-bar-track {
-  height: 5px;
-  background: var(--tv-surface-hover);
-  border-radius: 3px;
-  position: relative;
-  overflow: visible;
+.tv-wl-perf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
-.tv-wl-range-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #ef5350, #26a69a);
-  border-radius: 3px;
+.tv-wl-perf-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border-radius: 6px;
+}
+
+.tv-wl-perf-card.pos {
+  background: #e8f5e9;
+  color: #089981;
+}
+.tv-wl-perf-card.neg {
+  background: #ffebee;
+  color: #f23645;
+}
+
+.theme-dark .tv-wl-perf-card.pos {
+  background: rgba(38, 166, 154, 0.15);
+  color: #26a69a;
+}
+.theme-dark .tv-wl-perf-card.neg {
+  background: rgba(239, 83, 80, 0.15);
+  color: #ef5350;
+}
+
+.perf-val {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.perf-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tv-text-muted);
+  margin-top: 2px;
 }
 
 .tv-wl-range-bar-pointer {
@@ -2431,7 +2985,7 @@ body {
   width: 130px;
   background: var(--tv-surface-hover);
   border: 1px solid var(--tv-border);
-  color: white;
+  color: var(--tv-text);
   padding: 4px 6px;
   border-radius: 3px;
 }

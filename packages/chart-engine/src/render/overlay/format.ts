@@ -34,3 +34,25 @@ export function formatDateTimeFull(unixSeconds: number): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} IST`;
 }
+
+export function formatCrosshairTime(unixSeconds: number, timeframe: string): string {
+  const d = new Date((unixSeconds + IST_OFFSET_SEC) * 1000);
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const dayName = days[d.getUTCDay()];
+  const dateNum = d.getUTCDate();
+  const monthName = months[d.getUTCMonth()];
+  const yearShort = String(d.getUTCFullYear()).slice(2);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const timeStr = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+
+  const intraday = ["1m", "3m", "5m", "15m", "30m", "1H", "4H"].includes(timeframe);
+  if (intraday) {
+    return `${dayName} ${dateNum} ${monthName} '${yearShort}  ${timeStr}`;
+  }
+  if (timeframe === "1D" || timeframe === "1W") {
+    return `${dayName} ${dateNum} ${monthName} '${yearShort}`;
+  }
+  return `${monthName} '${yearShort}`;
+}

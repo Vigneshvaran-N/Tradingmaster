@@ -49,6 +49,8 @@ export type IndicatorType =
   | "SMA"
   | "EMA"
   | "WMA"
+  | "HMA"
+  | "ALMA"
   | "VWAP"
   | "RSI"
   | "MACD"
@@ -57,19 +59,72 @@ export type IndicatorType =
   | "SUPERTREND"
   | "BOLLINGER"
   | "VOLUME_AVERAGE"
-  | "VOLUME_SPIKE";
+  | "VOLUME_SPIKE"
+  | "VOLUME"
+  | "VOLUME_24H"
+  | "VOLUME_OSC"
+  | "ADL_ACCDIST"
+  | "ADL_LINE"
+  | "ADL_RATIO"
+  | "AROON"
+  | "AROON_OSC"
+  | "AUTO_FIB_EXT"
+  | "AUTO_FIB_RET"
+  | "AUTO_KEY_LEVELS"
+  | "AUTO_PITCHFORK"
+  | "AUTO_TRENDLINES"
+  | "ADR"
+  | "AO"
+  | "CMF"
+  | "CCI"
+  | "DONCHIAN"
+  | "ICHIMOKU"
+  | "KELTNER"
+  | "MFI"
+  | "PSAR"
+  | "PIVOT_HL"
+  | "STOCH"
+  | "WILLIAMS_R";
 
 export const DEFAULT_PANE: Record<IndicatorType, PaneKind> = {
   SMA: "overlay",
   EMA: "overlay",
   WMA: "overlay",
+  HMA: "overlay",
+  ALMA: "overlay",
   VWAP: "overlay",
   BOLLINGER: "overlay",
   SUPERTREND: "overlay",
+  AUTO_FIB_EXT: "overlay",
+  AUTO_FIB_RET: "overlay",
+  AUTO_KEY_LEVELS: "overlay",
+  AUTO_PITCHFORK: "overlay",
+  AUTO_TRENDLINES: "overlay",
+  DONCHIAN: "overlay",
+  ICHIMOKU: "overlay",
+  KELTNER: "overlay",
+  PSAR: "overlay",
+  PIVOT_HL: "overlay",
+
   RSI: "separate",
   MACD: "separate",
   ATR: "separate",
   ADX: "separate",
   VOLUME_AVERAGE: "separate",
   VOLUME_SPIKE: "separate",
+  VOLUME: "separate",
+  VOLUME_24H: "separate",
+  VOLUME_OSC: "separate",
+  ADL_ACCDIST: "separate",
+  ADL_LINE: "separate",
+  ADL_RATIO: "separate",
+  AROON: "separate",
+  AROON_OSC: "separate",
+  ADR: "separate",
+  AO: "separate",
+  CMF: "separate",
+  CCI: "separate",
+  MFI: "separate",
+  STOCH: "separate",
+  WILLIAMS_R: "separate",
 };

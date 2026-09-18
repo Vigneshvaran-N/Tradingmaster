@@ -13,11 +13,76 @@ import {
   IconCamera,
   IconChevronDown,
   IconPlus,
+  IconStar,
+  IconStarOutline,
 } from "./icons";
 
-const QUICK_TIMEFRAMES: Timeframe[] = ["1m", "3m", "5m", "15m", "30m", "1H", "4H", "1D", "1W", "1M"];
-
 export type ChartType = "candles" | "hollow" | "heikin-ashi" | "line" | "area" | "bars";
+
+const TIMEFRAME_GROUPS: { category: string; items: { tf: Timeframe; label: string }[] }[] = [
+  {
+    category: "TICKS",
+    items: [
+      { tf: "1t", label: "1 tick" },
+      { tf: "10t", label: "10 ticks" },
+      { tf: "100t", label: "100 ticks" },
+      { tf: "1000t", label: "1000 ticks" },
+    ],
+  },
+  {
+    category: "SECONDS",
+    items: [
+      { tf: "1s", label: "1 second" },
+      { tf: "5s", label: "5 seconds" },
+      { tf: "10s", label: "10 seconds" },
+      { tf: "15s", label: "15 seconds" },
+      { tf: "30s", label: "30 seconds" },
+      { tf: "45s", label: "45 seconds" },
+    ],
+  },
+  {
+    category: "MINUTES",
+    items: [
+      { tf: "1m", label: "1 minute" },
+      { tf: "2m", label: "2 minutes" },
+      { tf: "3m", label: "3 minutes" },
+      { tf: "5m", label: "5 minutes" },
+      { tf: "10m", label: "10 minutes" },
+      { tf: "15m", label: "15 minutes" },
+      { tf: "30m", label: "30 minutes" },
+      { tf: "45m", label: "45 minutes" },
+    ],
+  },
+  {
+    category: "HOURS",
+    items: [
+      { tf: "1H", label: "1 hour" },
+      { tf: "2H", label: "2 hours" },
+      { tf: "3H", label: "3 hours" },
+      { tf: "4H", label: "4 hours" },
+    ],
+  },
+  {
+    category: "DAYS",
+    items: [
+      { tf: "1D", label: "1 day" },
+      { tf: "1W", label: "1 week" },
+      { tf: "1M", label: "1 month" },
+      { tf: "3M", label: "3 months" },
+      { tf: "6M", label: "6 months" },
+      { tf: "12M", label: "12 months" },
+    ],
+  },
+  {
+    category: "RANGES",
+    items: [
+      { tf: "1r", label: "1 range" },
+      { tf: "10r", label: "10 ranges" },
+      { tf: "100r", label: "100 ranges" },
+      { tf: "1000r", label: "1000 ranges" },
+    ],
+  },
+];
 
 export interface TopBarProps {
   symbol: string;
@@ -39,8 +104,23 @@ export interface TopBarProps {
 }
 
 export function TopBar(props: TopBarProps) {
+  const [favoriteTimeframes, setFavoriteTimeframes] = useState<Timeframe[]>(["1m", "5m", "15m", "1H", "1D"]);
+  const [showTfDropdown, setShowTfDropdown] = useState(false);
+  const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
   const [showChartTypeDropdown, setShowChartTypeDropdown] = useState(false);
   const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
+
+  function toggleCategory(category: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    setCollapsedCategories((prev) => ({ ...prev, [category]: !prev[category] }));
+  }
+
+  function toggleFavorite(tf: Timeframe, e: React.MouseEvent) {
+    e.stopPropagation();
+    setFavoriteTimeframes((prev) =>
+      prev.includes(tf) ? prev.filter((t) => t !== tf) : [...prev, tf]
+    );
+  }
 
   function toggleFullscreen() {
     if (!document.fullscreenElement) {
@@ -72,17 +152,83 @@ export function TopBar(props: TopBarProps) {
 
         <div className="tv-topbar-divider" />
 
-        {/* Timeframes */}
-        <div className="tv-tf-list">
-          {QUICK_TIMEFRAMES.map((tf) => (
+        {/* Timeframes Section */}
+        <div className="tv-tf-section">
+          {/* Quick Favorite Buttons */}
+          <div className="tv-tf-list">
+            {favoriteTimeframes.map((tf) => (
+              <button
+                key={tf}
+                className={`tv-tf-btn ${tf === props.timeframe ? "active" : ""}`}
+                onClick={() => props.onTimeframeChange(tf)}
+                title={`Select ${tf} Timeframe`}
+              >
+                {tf}
+              </button>
+            ))}
+          </div>
+
+          {/* Timeframe Dropdown Selector */}
+          <div className="tv-dropdown-container">
             <button
-              key={tf}
-              className={`tv-tf-btn ${tf === props.timeframe ? "active" : ""}`}
-              onClick={() => props.onTimeframeChange(tf)}
+              className={`tv-tf-dropdown-btn ${showTfDropdown ? "active" : ""}`}
+              onClick={() => setShowTfDropdown(!showTfDropdown)}
+              title="Select Timeframe Interval (Dropdown)"
             >
-              {tf}
+              <span>{props.timeframe}</span>
+              <IconChevronDown />
             </button>
-          ))}
+
+            {showTfDropdown && (
+              <div className="tv-tf-menu-dropdown" onMouseLeave={() => setShowTfDropdown(false)}>
+                {/* Header: Add custom interval */}
+                <div className="tv-tf-custom-item" onClick={() => alert("Custom interval generator: Enter your desired interval in minutes/hours.")}>
+                  <IconPlus />
+                  <span>Add custom interval...</span>
+                </div>
+                <div className="tv-tf-menu-divider" />
+
+                {TIMEFRAME_GROUPS.map((group) => {
+                  const isCollapsed = Boolean(collapsedCategories[group.category]);
+                  return (
+                    <div key={group.category} className="tv-tf-group">
+                      <div className="tv-tf-group-header" onClick={(e) => toggleCategory(group.category, e)}>
+                        <span>{group.category}</span>
+                        <span className={`tv-tf-category-chevron ${isCollapsed ? "collapsed" : ""}`}>∧</span>
+                      </div>
+                      {!isCollapsed &&
+                        group.items.map((item) => {
+                          const isFav = favoriteTimeframes.includes(item.tf);
+                          const isActive = item.tf === props.timeframe;
+                          return (
+                            <div
+                              key={item.tf}
+                              className={`tv-tf-menu-item ${isActive ? "active" : ""}`}
+                              onClick={() => {
+                                props.onTimeframeChange(item.tf);
+                                setShowTfDropdown(false);
+                              }}
+                            >
+                              <div className="tv-tf-item-left">
+                                <span className="tv-tf-check-mark">{isActive ? "✓" : ""}</span>
+                                <span className="tv-tf-item-label">{item.label}</span>
+                              </div>
+                              <button
+                                className={`tv-tf-star-btn ${isFav ? "active-star" : ""}`}
+                                onClick={(e) => toggleFavorite(item.tf, e)}
+                                title={isFav ? "Remove from topbar favorites" : "Add to topbar favorites"}
+                              >
+                                {isFav ? <IconStar /> : <IconStarOutline />}
+                              </button>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="tv-topbar-divider" />

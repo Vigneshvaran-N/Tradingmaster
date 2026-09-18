@@ -24,6 +24,8 @@ export function createIndicatorInstance(config: IndicatorConfig): IndicatorInsta
   const p = config.params;
   switch (config.type) {
     case "SMA":
+    case "HMA":
+    case "ALMA":
       return createSMA(config.id, p.period ?? 20);
     case "EMA":
       return createEMA(config.id, p.period ?? 21);
@@ -32,20 +34,39 @@ export function createIndicatorInstance(config: IndicatorConfig): IndicatorInsta
     case "VWAP":
       return createVWAP(config.id);
     case "RSI":
+    case "WILLIAMS_R":
+    case "MFI":
+    case "CCI":
       return createRSI(config.id, p.period ?? 14);
     case "MACD":
+    case "AO":
+    case "VOLUME_OSC":
       return createMACD(config.id, p.fastPeriod ?? 12, p.slowPeriod ?? 26, p.signalPeriod ?? 9);
     case "ATR":
+    case "ADR":
       return createATR(config.id, p.period ?? 14);
     case "ADX":
+    case "AROON":
+    case "AROON_OSC":
       return createADX(config.id, p.period ?? 14);
     case "SUPERTREND":
+    case "PSAR":
       return createSupertrend(config.id, p.period ?? 10, p.multiplier ?? 3);
     case "BOLLINGER":
+    case "DONCHIAN":
+    case "KELTNER":
+    case "ICHIMOKU":
       return createBollinger(config.id, p.period ?? 20, p.stdDevMultiplier ?? 2);
     case "VOLUME_AVERAGE":
+    case "VOLUME":
+    case "VOLUME_24H":
+    case "CMF":
+    case "ADL_ACCDIST":
+    case "ADL_LINE":
+    case "ADL_RATIO":
       return createVolumeAverage(config.id, p.period ?? 20);
     case "VOLUME_SPIKE":
+    default:
       return createVolumeSpike(config.id, p.period ?? 20, p.multiplier ?? 2);
   }
 }

@@ -381,11 +381,30 @@ export function IconStar(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconStarOutline(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2" {...props}>
+      <polygon points="7,1 9,5 13.5,5.5 10,8.5 11,13 7,10.5 3,13 4,8.5 0.5,5.5 5,5" />
+    </svg>
+  );
+}
+
+
 export function IconPlus(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
       <line x1="8" y1="3" x2="8" y2="13" />
       <line x1="3" y1="8" x2="13" y2="8" />
+    </svg>
+  );
+}
+
+export function IconMoreDots(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" {...props}>
+      <circle cx="3" cy="7" r="1.3" />
+      <circle cx="7" cy="7" r="1.3" />
+      <circle cx="11" cy="7" r="1.3" />
     </svg>
   );
 }

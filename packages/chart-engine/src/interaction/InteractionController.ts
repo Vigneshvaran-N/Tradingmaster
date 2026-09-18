@@ -1,11 +1,11 @@
 export interface InteractionCallbacks {
   /** Left button pressed down. */
   onDragStart: (x: number, y: number) => void;
-  /** Mouse moved while the left button is held; `dxPixels` is the delta since the last move. */
-  onDragMove: (x: number, y: number, dxPixels: number) => void;
+  /** Mouse moved while the left button is held; `dxPixels` and `dyPixels` are deltas since the last move. */
+  onDragMove: (x: number, y: number, dxPixels: number, dyPixels: number) => void;
   /** Left button released (always paired with a preceding onDragStart). */
   onDragEnd: (x: number, y: number) => void;
-  onZoom: (pixelX: number, factor: number) => void;
+  onZoom: (pixelX: number, pixelY: number, factor: number) => void;
   onCrosshairMove: (x: number, y: number) => void;
   onCrosshairLeave: () => void;
   onResize: (width: number, height: number) => void;
@@ -64,7 +64,8 @@ export class InteractionController {
     const [x, y] = this.localXY(e);
     if (this.dragging && e.buttons === 1) {
       const dx = x - this.lastX;
-      this.callbacks.onDragMove(x, y, dx);
+      const dy = y - this.lastY;
+      this.callbacks.onDragMove(x, y, dx, dy);
       this.lastX = x;
       this.lastY = y;
     }
@@ -84,9 +85,9 @@ export class InteractionController {
 
   private handleWheel = (e: WheelEvent) => {
     e.preventDefault();
-    const [x] = this.localXY(e);
+    const [x, y] = this.localXY(e);
     const factor = e.deltaY < 0 ? WHEEL_ZOOM_FACTOR : 1 / WHEEL_ZOOM_FACTOR;
-    this.callbacks.onZoom(x, factor);
+    this.callbacks.onZoom(x, y, factor);
   };
 
   private handleDoubleClick = (e: MouseEvent) => {

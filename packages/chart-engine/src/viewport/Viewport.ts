@@ -161,6 +161,34 @@ export class Viewport {
     this.manualRange = range;
   }
 
+  zoomYAxis(anchorY: number, factor: number, paneId = "main"): void {
+    const currentRange = this.getPaneRange(paneId);
+    const anchorPrice = this.yToPrice(anchorY, paneId) || (currentRange.min + currentRange.max) / 2;
+    const currentSpan = currentRange.max - currentRange.min || 1;
+    const newSpan = Math.max(0.0001, currentSpan * factor);
+
+    const rect = this.getPaneRect(paneId);
+    const ratio = rect && rect.height > 0 ? 1 - (anchorY - rect.top) / rect.height : 0.5;
+    const clampedRatio = Math.max(0.05, Math.min(0.95, ratio));
+
+    const newMin = anchorPrice - newSpan * clampedRatio;
+    const newMax = anchorPrice + newSpan * (1 - clampedRatio);
+
+    this.autoScale = false;
+    this.manualRange = { min: newMin, max: newMax };
+    this.paneRanges.set(paneId, this.manualRange);
+  }
+
+  scaleYAxisByPixels(dyPixels: number, anchorY: number, paneId = "main"): void {
+    const factor = Math.exp(dyPixels * 0.005);
+    this.zoomYAxis(anchorY, factor, paneId);
+  }
+
+  resetYAxis(paneId = "main"): void {
+    this.autoScale = true;
+    this.manualRange = null;
+  }
+
   /** Called by the renderer each frame to refresh a pane's auto-computed price bounds. */
   setPaneRange(paneId: string, range: PriceRange): void {
     if (paneId === "main" && !this.autoScale && this.manualRange) {
