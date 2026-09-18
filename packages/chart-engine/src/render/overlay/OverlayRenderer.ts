@@ -5,7 +5,7 @@ import { Timeframe } from "@trading-master/market-data";
 import { ChartTheme } from "../../theme";
 import { PRICE_AXIS_WIDTH, TIME_AXIS_HEIGHT } from "../../viewport/PaneLayout";
 import { Viewport } from "../../viewport/Viewport";
-import { formatPrice, formatTimeForTimeframe, formatDateTimeFull, formatVolume } from "./format";
+import { formatPrice, formatTimeForTimeframe, formatCrosshairTime, formatDateTimeFull, formatVolume } from "./format";
 
 export interface IndicatorLineSpec {
   id: string;
@@ -63,10 +63,14 @@ export class OverlayRenderer {
   }
 
   resize(cssWidth: number, cssHeight: number, dpr: number): void {
+    const w = Math.max(1, Math.round(cssWidth * dpr));
+    const h = Math.max(1, Math.round(cssHeight * dpr));
+    if (this.canvas.width !== w || this.canvas.height !== h) {
+      this.canvas.width = w;
+      this.canvas.height = h;
+    }
     this.cssWidth = cssWidth;
     this.cssHeight = cssHeight;
-    this.canvas.width = Math.max(1, Math.round(cssWidth * dpr));
-    this.canvas.height = Math.max(1, Math.round(cssHeight * dpr));
     this.canvas.style.width = `${cssWidth}px`;
     this.canvas.style.height = `${cssHeight}px`;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -124,11 +128,25 @@ export class OverlayRenderer {
       ctx.strokeStyle = theme.gridColor;
     }
 
+    // Vertical right axis border line (separates chart plot area from Y-axis price scale)
+    ctx.strokeStyle = theme.axisBorderColor;
+    ctx.beginPath();
+    ctx.moveTo(plotWidth, 0);
+    ctx.lineTo(plotWidth, plotHeight + TIME_AXIS_HEIGHT);
+    ctx.stroke();
+
+    // Horizontal bottom axis border line (separates chart plot area from X-axis time scale)
+    ctx.beginPath();
+    ctx.moveTo(0, plotHeight);
+    ctx.lineTo(plotWidth + PRICE_AXIS_WIDTH, plotHeight);
+    ctx.stroke();
+
     const step = this.timeTickStep(p.viewport);
     const { start, end } = p.viewport.visibleIndexRange();
     const first = Math.ceil(Math.max(0, start) / step) * step;
     for (let i = first; i <= end && i < p.store.length; i += step) {
       const x = p.viewport.indexToX(i);
+      ctx.strokeStyle = theme.gridColor;
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, plotHeight);
@@ -334,28 +352,55 @@ export class OverlayRenderer {
 
     const bar = p.store.barAt(Math.round(p.viewport.xToIndex(crosshair.x)));
     if (bar) {
-      this.drawLabelBox(crosshair.x, plotHeight, formatTimeForTimeframe(bar.time, p.timeframe), theme, "bottom");
+      this.drawLabelBox(crosshair.x, plotHeight, formatCrosshairTime(bar.time, p.timeframe), theme, "bottom");
     }
   }
 
   private drawLabelBox(x: number, y: number, text: string, theme: ChartTheme, anchor: "right" | "bottom"): void {
     const ctx = this.ctx;
     ctx.font = `11px ${theme.fontFamily}`;
-    const paddingX = 6;
+    const paddingX = 8;
     const textWidth = ctx.measureText(text).width;
-    ctx.fillStyle = theme.crosshairLabelBg;
+
+    // TradingView signature black badge background for crosshair labels on both axes
+    const labelBg = "#131722";
+    const labelText = "#ffffff";
+
     if (anchor === "right") {
-      const h = 18;
-      ctx.fillRect(x, y - h / 2, PRICE_AXIS_WIDTH, h);
-      ctx.fillStyle = theme.crosshairLabelText;
+      const h = 20;
+      const w = Math.max(PRICE_AXIS_WIDTH, textWidth + paddingX * 2);
+      ctx.fillStyle = labelBg;
+      ctx.beginPath();
+      if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(x + 1, y - h / 2, w - 2, h, 3);
+      } else {
+        ctx.rect(x + 1, y - h / 2, w - 2, h);
+      }
+      ctx.fill();
+
+      ctx.fillStyle = labelText;
       ctx.textBaseline = "middle";
+      ctx.textAlign = "left";
       ctx.fillText(text, x + paddingX, y);
     } else {
+      const h = 22;
       const w = textWidth + paddingX * 2;
-      ctx.fillRect(x - w / 2, y, w, TIME_AXIS_HEIGHT - 2);
-      ctx.fillStyle = theme.crosshairLabelText;
-      ctx.textBaseline = "top";
-      ctx.fillText(text, x - w / 2 + paddingX, y + 7);
+      const boxX = x - w / 2;
+      const boxY = y + 2;
+
+      ctx.fillStyle = labelBg;
+      ctx.beginPath();
+      if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(boxX, boxY, w, h, 3);
+      } else {
+        ctx.rect(boxX, boxY, w, h);
+      }
+      ctx.fill();
+
+      ctx.fillStyle = labelText;
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      ctx.fillText(text, x, boxY + h / 2);
     }
   }
 

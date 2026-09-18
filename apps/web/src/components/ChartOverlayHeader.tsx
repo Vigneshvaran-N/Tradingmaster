@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CandleSnapshot, Timeframe } from "@trading-master/market-data";
 import { ActiveIndicator } from "../types";
 import { PlaceOrderRequest } from "@trading-master/paper-trading";
-import { IconEye, IconEyeClosed, IconSettings, IconTrash } from "./icons";
+import { IconEye, IconEyeClosed, IconSettings, IconTrash, IconMoreDots } from "./icons";
 
 export interface ChartOverlayHeaderProps {
   symbol: string;
@@ -10,6 +10,10 @@ export interface ChartOverlayHeaderProps {
   activeIndicators: ActiveIndicator[];
   onToggleIndicator: (id: string, enabled: boolean) => void;
   onRemoveIndicator: (id: string) => void;
+  onOpenIndicatorSettings?: (id: string) => void;
+  volumeEnabled?: boolean;
+  onToggleVolume?: (enabled: boolean) => void;
+  onOpenVolumeSettings?: () => void;
   onPlaceOrder: (req: PlaceOrderRequest) => void;
   lastPrice: number;
   currentBar: CandleSnapshot | null;
@@ -19,6 +23,9 @@ export interface ChartOverlayHeaderProps {
 export function ChartOverlayHeader(props: ChartOverlayHeaderProps) {
   const [orderQty, setOrderQty] = useState(25);
   const [orderNotification, setOrderNotification] = useState<string | null>(null);
+  const [legendCollapsed, setLegendCollapsed] = useState(false);
+
+  const isVolEnabled = props.volumeEnabled ?? true;
 
   const bar = props.currentBar;
   const o = bar ? bar.open : props.lastPrice;
@@ -93,7 +100,7 @@ export function ChartOverlayHeader(props: ChartOverlayHeaderProps) {
         )}
       </div>
 
-      {/* Row 2: Instant Buy/Sell Execution Box (Matches user screenshot) */}
+      {/* Row 2: Instant Buy/Sell Execution Box */}
       <div className="tv-overlay-execution-row">
         <div className="tv-quick-trade-widget">
           <button className="tv-trade-btn sell" onClick={handleQuickSell} title="Execute Instant Market Sell Order">
@@ -121,40 +128,93 @@ export function ChartOverlayHeader(props: ChartOverlayHeaderProps) {
         </div>
       </div>
 
-      {/* Row 3: Active Indicators (e.g. Vol 960.28 K) */}
-      <div className="tv-overlay-indicators-row">
-        <div className="tv-indicator-badge">
-          <span className="tv-ind-name">Vol</span>
-          <span className="tv-ind-val">{props.volumeDisplay || "960.28 K"}</span>
-        </div>
-
-        {props.activeIndicators.map((ind) => (
-          <div key={ind.id} className={`tv-indicator-badge ${!ind.enabled ? "dimmed" : ""}`}>
-            <span className="tv-ind-name">{ind.label}</span>
-            <div className="tv-ind-controls">
-              <button
-                className="tv-ind-btn"
-                title={ind.enabled ? "Hide" : "Show"}
-                onClick={() => props.onToggleIndicator(ind.id, !ind.enabled)}
-              >
-                {ind.enabled ? <IconEye /> : <IconEyeClosed />}
-              </button>
-              <button
-                className="tv-ind-btn"
-                title="Settings"
-              >
-                <IconSettings />
-              </button>
-              <button
-                className="tv-ind-btn"
-                title="Remove Indicator"
-                onClick={() => props.onRemoveIndicator(ind.id)}
-              >
-                ✕
-              </button>
+      {/* Row 3: Interactive Volume & Indicators Legend (Matches TradingView screenshot) */}
+      <div className="tv-overlay-indicators-container">
+        {!legendCollapsed && (
+          <div className="tv-overlay-indicators-row">
+            {/* Volume Indicator Badge */}
+            <div className={`tv-indicator-badge ${!isVolEnabled ? "dimmed" : ""}`}>
+              <span className="tv-ind-name">Vol</span>
+              <span className="tv-ind-val">{props.volumeDisplay || "960.28 K"}</span>
+              <div className="tv-ind-controls">
+                <button
+                  className="tv-ind-btn"
+                  title={isVolEnabled ? "Hide" : "Show"}
+                  onClick={() => props.onToggleVolume?.(!isVolEnabled)}
+                >
+                  {isVolEnabled ? <IconEye /> : <IconEyeClosed />}
+                </button>
+                <button
+                  className="tv-ind-btn"
+                  title="Settings"
+                  onClick={props.onOpenVolumeSettings}
+                >
+                  <IconSettings />
+                </button>
+                <button
+                  className="tv-ind-btn"
+                  title="Remove"
+                  onClick={() => props.onToggleVolume?.(false)}
+                >
+                  <IconTrash />
+                </button>
+                <button
+                  className="tv-ind-btn"
+                  title="More"
+                  onClick={() => alert("Volume Options: Source code, Visual order, Move to pane above")}
+                >
+                  <IconMoreDots />
+                </button>
+              </div>
             </div>
+
+            {/* Active User Indicators */}
+            {props.activeIndicators.map((ind) => (
+              <div key={ind.id} className={`tv-indicator-badge ${!ind.enabled ? "dimmed" : ""}`}>
+                <span className="tv-ind-name">{ind.label}</span>
+                <div className="tv-ind-controls">
+                  <button
+                    className="tv-ind-btn"
+                    title={ind.enabled ? "Hide" : "Show"}
+                    onClick={() => props.onToggleIndicator(ind.id, !ind.enabled)}
+                  >
+                    {ind.enabled ? <IconEye /> : <IconEyeClosed />}
+                  </button>
+                  <button
+                    className="tv-ind-btn"
+                    title="Settings"
+                    onClick={() => props.onOpenIndicatorSettings?.(ind.id)}
+                  >
+                    <IconSettings />
+                  </button>
+                  <button
+                    className="tv-ind-btn"
+                    title="Remove"
+                    onClick={() => props.onRemoveIndicator(ind.id)}
+                  >
+                    <IconTrash />
+                  </button>
+                  <button
+                    className="tv-ind-btn"
+                    title="More"
+                    onClick={() => alert(`${ind.label} Options: Source code, Visual order, Pin to scale`)}
+                  >
+                    <IconMoreDots />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+
+        {/* Legend Collapse Button (Matching user screenshot button below Vol badge) */}
+        <button
+          className="tv-ind-collapse-btn"
+          title={legendCollapsed ? "Show legend" : "Hide legend"}
+          onClick={() => setLegendCollapsed(!legendCollapsed)}
+        >
+          {legendCollapsed ? "∨" : "∧"}
+        </button>
       </div>
     </div>
   );

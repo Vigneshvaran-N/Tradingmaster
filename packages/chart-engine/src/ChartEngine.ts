@@ -71,6 +71,7 @@ export class ChartEngine {
 
   private priceLines: PriceLine[] = [];
   private draggedPriceLineId: string | null = null;
+  private isYAxisDrag = false;
 
   private crosshair: CrosshairState | null = null;
   private armedDrawingType: DrawingType | null = null;
@@ -128,6 +129,10 @@ export class ChartEngine {
 
     this.interaction = new InteractionController(container, {
       onDragStart: (x, y) => {
+        if (x >= this.viewport.width) {
+          this.isYAxisDrag = true;
+          return;
+        }
         if (this.cursorMode === "eraser") {
           const nearestId = this.drawingManager.findNearest(x, y, this.viewport);
           if (nearestId) {
@@ -148,7 +153,13 @@ export class ChartEngine {
           this.drawingDragActive = true;
         }
       },
-      onDragMove: (x, y, dx) => {
+      onDragMove: (x, y, dx, dy) => {
+        if (this.isYAxisDrag) {
+          const paneId = this.paneIdAtY(y) || "main";
+          this.viewport.scaleYAxisByPixels(dy, y, paneId);
+          this.requestRender();
+          return;
+        }
         if (this.draggedPriceLineId) {
           this.movePriceLinePreview(this.draggedPriceLineId, this.viewport.yToPrice(y, "main"));
           return;
@@ -161,6 +172,10 @@ export class ChartEngine {
         }
       },
       onDragEnd: (x, y) => {
+        if (this.isYAxisDrag) {
+          this.isYAxisDrag = false;
+          return;
+        }
         if (this.draggedPriceLineId) {
           const id = this.draggedPriceLineId;
           this.draggedPriceLineId = null;
@@ -186,13 +201,20 @@ export class ChartEngine {
         }
         this.requestRender();
       },
-      onZoom: (x, factor) => {
-        this.viewport.zoomAtPixel(x, factor);
+      onZoom: (x, y, factor) => {
+        if (x >= this.viewport.width) {
+          const paneId = this.paneIdAtY(y) || "main";
+          this.viewport.zoomYAxis(y, factor, paneId);
+        } else {
+          this.viewport.zoomAtPixel(x, factor);
+        }
         this.requestRender();
       },
       onCrosshairMove: (x, y) => {
-        if (!this.draggedPriceLineId) {
-          container.style.cursor = !this.armedDrawingType && this.draggablePriceLineAt(x, y) ? "ns-resize" : "";
+        if (x >= this.viewport.width) {
+          container.style.cursor = "ns-resize";
+        } else if (!this.draggedPriceLineId) {
+          container.style.cursor = !this.armedDrawingType && this.draggablePriceLineAt(x, y) ? "ns-resize" : (this.armedDrawingType ? "crosshair" : "");
         }
         this.crosshair = { x, y, paneId: this.paneIdAtY(y) };
         this.emitCrosshair();
@@ -204,7 +226,15 @@ export class ChartEngine {
         this.requestRender();
       },
       onResize: (w, h) => this.applySize(w, h),
-      onDoubleClick: () => this.fitAll(),
+      onDoubleClick: (x, y) => {
+        if (x >= this.viewport.width) {
+          const paneId = this.paneIdAtY(y) || "main";
+          this.viewport.resetYAxis(paneId);
+          this.requestRender();
+        } else {
+          this.fitAll();
+        }
+      },
     });
 
     this.startLoop();
@@ -282,9 +312,23 @@ export class ChartEngine {
     this.requestRender();
   }
 
+  private volumeEnabled = true;
+
+  setVolumeEnabled(enabled: boolean): void {
+    this.volumeEnabled = enabled;
+    this.viewport.setPaneSpecs(this.buildPaneSpecs());
+    this.requestRender();
+  }
+
+  isVolumeEnabled(): boolean {
+    return this.volumeEnabled;
+  }
+
   private buildPaneSpecs(): PaneSpec[] {
     const specs: PaneSpec[] = [{ id: "main", weight: 3, minHeight: 140 }];
-    specs.push({ id: "volume", weight: 1, minHeight: 60 });
+    if (this.volumeEnabled) {
+      specs.push({ id: "volume", weight: 1, minHeight: 60 });
+    }
     for (const config of this.indicatorConfigs.values()) {
       if (config.pane !== "separate") continue;
       if (this.indicatorEnabled.get(config.id) === false) continue;
@@ -505,12 +549,24 @@ export class ChartEngine {
 
   // ---- sizing / render loop ----
 
+  private lastCssWidth = 0;
+  private lastCssHeight = 0;
+
   private applySize(width: number, height: number): void {
-    this.viewport.setContainerSize(width, height);
+    const w = Math.round(width);
+    const h = Math.round(height);
+    if (w <= 0 || h <= 0) return;
+    if (w === this.lastCssWidth && h === this.lastCssHeight) return;
+
+    this.lastCssWidth = w;
+    this.lastCssHeight = h;
+
+    this.viewport.setContainerSize(w, h);
     const totalPaneHeight = this.viewport.height;
     this.glRenderer.resize(this.viewport.width, totalPaneHeight, this.dpr);
-    this.overlayRenderer.resize(width, height, this.dpr);
-    this.requestRender();
+    this.overlayRenderer.resize(w, h, this.dpr);
+    this.dirty = false;
+    this.renderFrame();
   }
 
   private paneIdAtY(y: number): string {
@@ -550,7 +606,7 @@ export class ChartEngine {
 
     this.glRenderer.clear(hexBg(this.theme.background));
     if (this.store.length > 0) {
-      this.glRenderer.renderCandles(this.store, this.viewport, this.theme, "volume");
+      this.glRenderer.renderCandles(this.store, this.viewport, this.theme, this.volumeEnabled ? "volume" : null);
     }
 
     const indicatorLines: IndicatorLineSpec[] = [];

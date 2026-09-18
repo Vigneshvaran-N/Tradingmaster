@@ -165,6 +165,7 @@ export default function App() {
 
   // Live bar state
   const [currentBar, setCurrentBar] = useState<CandleSnapshot | null>(null);
+  const [volumeEnabled, setVolumeEnabled] = useState(true);
   const [activeIndicators, setActiveIndicators] = useState<ActiveIndicator[]>([]);
   const [watchlists, setWatchlists] = useState<WatchlistDef[]>(DEFAULT_WATCHLISTS);
   const [activeWatchlistId, setActiveWatchlistId] = useState(DEFAULT_WATCHLISTS[0]!.id);
@@ -644,6 +645,13 @@ export default function App() {
               activeIndicators={activeIndicators}
               onToggleIndicator={handleToggleIndicator}
               onRemoveIndicator={handleRemoveIndicator}
+              onOpenIndicatorSettings={(id) => setShowIndicatorsModal(true)}
+              volumeEnabled={volumeEnabled}
+              onToggleVolume={(enabled) => {
+                setVolumeEnabled(enabled);
+                chart?.setVolumeEnabled(enabled);
+              }}
+              onOpenVolumeSettings={() => setShowIndicatorsModal(true)}
               onPlaceOrder={(req) => paperEngine.placeOrder(req)}
               lastPrice={currentBar?.close ?? paperEngine.getLastPrice(symbol) ?? 0}
               currentBar={currentBar}

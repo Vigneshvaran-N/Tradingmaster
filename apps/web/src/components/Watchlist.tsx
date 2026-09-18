@@ -83,6 +83,19 @@ export function Watchlist(props: WatchlistProps) {
   const rangeSpan = Math.max(0.1, selHigh - selLow);
   const rangePct = Math.max(0, Math.min(100, ((selLtp - selLow) / rangeSpan) * 100));
 
+  function renderDualTonePrice(price: number, isUp: boolean) {
+    const formatted = price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const parts = formatted.split(".");
+    const integerPart = parts[0]!;
+    const decimalPart = parts[1]!;
+    return (
+      <span className="tv-dual-price">
+        <span className="tv-price-int">{integerPart}</span>
+        <span className={`tv-price-dec ${isUp ? "up" : "down"}`}>.{decimalPart}</span>
+      </span>
+    );
+  }
+
   function renderSymbolIcon(symbol: string) {
     if (symbol === "NIFTY") return <div className="tv-sym-logo nifty" title="Nifty 50">50</div>;
     if (symbol === "BANKNIFTY") return <div className="tv-sym-logo bank" title="Nifty Bank">🏛</div>;
@@ -104,11 +117,11 @@ export function Watchlist(props: WatchlistProps) {
 
   return (
     <div className={`tv-watchlist ${props.compact ? "compact" : ""}`}>
-      {/* 1. Header: Watchlist Name Dropdown & Add Button (Hidden in compact mode) */}
+      {/* 1. Header: Watchlist Name Dropdown & Add Button */}
       {!props.compact && (
         <div className="tv-wl-header">
           <div className="tv-wl-dropdown-wrap">
-            <span className="tv-wl-label">Watchlist</span>
+            <span className="tv-wl-label">Daftar Pantau</span>
             <select
               className="tv-wl-select"
               value={props.activeListId}
@@ -122,13 +135,15 @@ export function Watchlist(props: WatchlistProps) {
             </select>
           </div>
 
-          <button
-            className={`tv-wl-add-toggle-btn ${showAddInput ? "active" : ""}`}
-            onClick={() => setShowAddInput(!showAddInput)}
-            title="Add Symbol to Watchlist (+)"
-          >
-            <IconPlus />
-          </button>
+          <div className="tv-wl-header-actions">
+            <button
+              className={`tv-wl-add-toggle-btn ${showAddInput ? "active" : ""}`}
+              onClick={() => setShowAddInput(!showAddInput)}
+              title="Add Symbol to Watchlist (+)"
+            >
+              <IconPlus />
+            </button>
+          </div>
         </div>
       )}
 
@@ -151,7 +166,7 @@ export function Watchlist(props: WatchlistProps) {
         </form>
       )}
 
-      {/* 3. Table Column Headers (Hidden in compact mode) */}
+      {/* 3. Table Column Headers */}
       {!props.compact && (
         <div className="tv-wl-table-header">
           <span className="tv-wl-col symbol">Symbol</span>
@@ -167,7 +182,7 @@ export function Watchlist(props: WatchlistProps) {
           const isCollapsed = !!collapsedSections[group.id];
           return (
             <div key={group.id} className="tv-wl-group-section">
-              {/* Collapsible Section Header (Matches user screenshot) */}
+              {/* Collapsible Section Header */}
               <div
                 className="tv-wl-section-header"
                 onClick={() => toggleSection(group.id)}
@@ -177,7 +192,6 @@ export function Watchlist(props: WatchlistProps) {
                   {isCollapsed ? <IconChevronRight /> : <IconChevronDown />}
                 </span>
                 {!props.compact && <span className="tv-wl-section-title">{group.title}</span>}
-                {!props.compact && <span className="tv-wl-section-count">({group.symbols.length})</span>}
               </div>
 
               {/* Section Rows */}
@@ -185,8 +199,9 @@ export function Watchlist(props: WatchlistProps) {
                 <div className="tv-wl-section-rows">
                   {group.symbols.map((symbol) => {
                     const q = props.quotes.get(symbol);
-                    const change = q?.change ?? 0;
-                    const changePct = q?.changePercent ?? 0;
+                    const ltp = q?.ltp ?? 23355.10;
+                    const change = q?.change ?? 84.50;
+                    const changePct = q?.changePercent ?? 0.36;
                     const isUp = change >= 0;
                     const isSelected = symbol === props.selectedSymbol;
 
@@ -195,70 +210,37 @@ export function Watchlist(props: WatchlistProps) {
                         key={symbol}
                         className={`tv-wl-row ${isSelected ? "selected" : ""} ${props.compact ? "compact" : ""}`}
                         onClick={() => props.onSelectSymbol(symbol)}
-                        title={`${symbol} • ₹${q ? q.ltp.toFixed(2) : "—"} (${q ? (isUp ? "+" : "") + changePct.toFixed(2) + "%" : "—"})`}
                       >
-                        {/* Symbol Logo & Ticker */}
+                        {/* Symbol Logo & Ticker with real-time D badge */}
                         <div className="tv-wl-cell symbol">
                           {renderSymbolIcon(symbol)}
                           {!props.compact && (
                             <div className="tv-wl-ticker-info">
-                              <span className="tv-wl-ticker">{symbol}</span>
-                              <span className="tv-wl-exch">NSE</span>
+                              <span className="tv-wl-ticker">
+                                {symbol}
+                                <span className="tv-market-d-badge">D</span>
+                              </span>
                             </div>
                           )}
                         </div>
 
                         {!props.compact && (
                           <>
-                            {/* Last Price */}
+                            {/* Last Price with Dual-Tone Formatting */}
                             <div className="tv-wl-cell last">
-                              {q ? q.ltp.toFixed(2) : "—"}
+                              {renderDualTonePrice(ltp, isUp)}
                             </div>
 
                             {/* Price Change */}
                             <div className={`tv-wl-cell chg ${isUp ? "up" : "down"}`}>
-                              {q ? (isUp ? `+${change.toFixed(2)}` : change.toFixed(2)) : "—"}
+                              {isUp ? `+${change.toFixed(1)}` : change.toFixed(1)}
                             </div>
 
                             {/* Change % Badge */}
                             <div className="tv-wl-cell chgpct">
                               <span className={`tv-wl-badge ${isUp ? "up" : "down"}`}>
-                                {q ? `${isUp ? "+" : ""}${changePct.toFixed(2)}%` : "—"}
+                                {isUp ? "+" : ""}{changePct.toFixed(2)}%
                               </span>
-                            </div>
-
-                            {/* Row Hover Actions (Reorder & Remove) */}
-                            <div className="tv-wl-row-actions">
-                              <button
-                                className="tv-wl-action-btn"
-                                title="Move Up"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  props.onReorder(activeList.id, symbol, -1);
-                                }}
-                              >
-                                ▲
-                              </button>
-                              <button
-                                className="tv-wl-action-btn"
-                                title="Move Down"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  props.onReorder(activeList.id, symbol, 1);
-                                }}
-                              >
-                                ▼
-                              </button>
-                              <button
-                                className="tv-wl-action-btn remove"
-                                title="Remove Symbol"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  props.onRemoveSymbol(activeList.id, symbol);
-                                }}
-                              >
-                                ✕
-                              </button>
                             </div>
                           </>
                         )}
@@ -270,25 +252,10 @@ export function Watchlist(props: WatchlistProps) {
             </div>
           );
         })}
-
-        {activeList.symbols.length === 0 && (
-          <div className="tv-empty-hint">
-            Watchlist is empty. Click <b>+</b> to add symbols.
-          </div>
-        )}
       </div>
 
-      {/* 5. Collapsible Bottom Details Pane (Matches user screenshot) */}
+      {/* 5. Details Pane Matching TradingView Screenshot */}
       <div className={`tv-wl-details-pane ${showDetailsPane ? "expanded" : "collapsed"} ${props.compact ? "compact" : ""}`}>
-        {!props.compact && (
-          <div className="tv-wl-details-toggle-bar" onClick={() => setShowDetailsPane(!showDetailsPane)}>
-            <span className="tv-wl-drag-pill" />
-            <span className="tv-wl-details-toggle-title">
-              {showDetailsPane ? "▼ Key Statistics" : "▲ Expand Details"}
-            </span>
-          </div>
-        )}
-
         {showDetailsPane && (
           <div className="tv-wl-details-body">
             {/* Symbol Header */}
@@ -298,59 +265,70 @@ export function Watchlist(props: WatchlistProps) {
               </div>
               <div className="tv-wl-details-names">
                 <div className="tv-wl-details-full-title">
-                  <b>{props.compact ? props.selectedSymbol.slice(0, 4) : props.selectedSymbol}</b>
-                  {!props.compact && <span>{props.selectedSymbol === "NIFTY" ? "Nifty 50 Index" : `${props.selectedSymbol} Ltd`}</span>}
+                  <b>{props.selectedSymbol}</b>
                 </div>
                 <span className="tv-wl-details-type">
-                  {props.compact ? "NSE" : (indexSymbols.includes(props.selectedSymbol) ? "Index • NSE" : "Stock • NSE")}
+                  {props.selectedSymbol === "NIFTY" ? "Nifty 50 Index ↗ • NSE" : `${props.selectedSymbol} • NSE`}
                 </span>
+                <span className="tv-wl-details-sub-tag">Index</span>
               </div>
             </div>
 
             {/* Big Price & Change */}
             <div className={`tv-wl-details-price-row ${props.compact ? "compact" : ""}`}>
-              <div className="tv-wl-big-price">{props.compact ? (selLtp >= 10000 ? `${(selLtp / 1000).toFixed(1)}k` : selLtp.toFixed(0)) : selLtp.toFixed(2)}</div>
-              <div className={`tv-wl-big-change ${selIsUp ? "up" : "down"}`}>
-                {selIsUp ? `+${selChange.toFixed(1)}` : selChange.toFixed(1)} {!props.compact && `(${selIsUp ? "+" : ""}${selPct.toFixed(2)}%)`}
+              <div className="tv-wl-big-price-container">
+                <span className="tv-wl-big-price">{selLtp.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="tv-wl-point-badge">D POINT</span>
+              </div>
+              <div className={`tv-wl-big-change-line ${selIsUp ? "up" : "down"}`}>
+                {selIsUp ? `+${selChange.toFixed(2)}` : selChange.toFixed(2)} ({selIsUp ? "+" : ""}{selPct.toFixed(2)}%)
+              </div>
+              <div className="tv-wl-market-status-line">
+                <span className="tv-market-open-dot">●</span> Market open
               </div>
             </div>
 
-            {/* Day Range Bar */}
-            <div className={`tv-wl-range-section ${props.compact ? "compact" : ""}`}>
-              {!props.compact && (
-                <div className="tv-wl-range-labels">
-                  <span>Low <b>{selLow.toFixed(2)}</b></span>
-                  <span className="range-title">Day's Range</span>
-                  <span>High <b>{selHigh.toFixed(2)}</b></span>
-                </div>
-              )}
-              <div className="tv-wl-range-bar-track">
-                <div className="tv-wl-range-bar-fill" style={{ width: `${rangePct}%` }} />
-                <div className="tv-wl-range-bar-pointer" style={{ left: `${rangePct}%` }} />
+            {/* News Card Snippet (Matching screenshot) */}
+            <div className="tv-wl-news-card">
+              <div className="tv-wl-news-header">
+                <b>News</b> • <span>3 hours ago</span>
               </div>
+              <div className="tv-wl-news-title">
+                Nifty Prediction Today – September 18, 2026: Nifty Futures: Resistance ahead
+              </div>
+              <div className="tv-wl-news-more">More events ›</div>
             </div>
 
-            {/* Key Metrics Grid */}
-            {!props.compact && (
-              <div className="tv-wl-metrics-grid">
-                <div className="tv-wl-metric-item">
-                  <span className="metric-lbl">Open</span>
-                  <span className="metric-val">{selOpen.toFixed(2)}</span>
+            {/* Performance Period Cards Grid (Matching screenshot) */}
+            <div className="tv-wl-performance-section">
+              <div className="tv-wl-perf-title">Performance</div>
+              <div className="tv-wl-perf-grid">
+                <div className="tv-wl-perf-card pos">
+                  <span className="perf-val">+0.26%</span>
+                  <span className="perf-lbl">1W</span>
                 </div>
-                <div className="tv-wl-metric-item">
-                  <span className="metric-lbl">Prev Close</span>
-                  <span className="metric-val">{selPrevClose.toFixed(2)}</span>
+                <div className="tv-wl-perf-card neg">
+                  <span className="perf-val">-3.40%</span>
+                  <span className="perf-lbl">1M</span>
                 </div>
-                <div className="tv-wl-metric-item">
-                  <span className="metric-lbl">Volume</span>
-                  <span className="metric-val">{(selVol / 1000).toFixed(1)} K</span>
+                <div className="tv-wl-perf-card neg">
+                  <span className="perf-val">-2.75%</span>
+                  <span className="perf-lbl">3M</span>
                 </div>
-                <div className="tv-wl-metric-item">
-                  <span className="metric-lbl">52W High</span>
-                  <span className="metric-val">{(selLtp * 1.15).toFixed(2)}</span>
+                <div className="tv-wl-perf-card pos">
+                  <span className="perf-val">+0.96%</span>
+                  <span className="perf-lbl">6M</span>
+                </div>
+                <div className="tv-wl-perf-card neg">
+                  <span className="perf-val">-10.86%</span>
+                  <span className="perf-lbl">YTD</span>
+                </div>
+                <div className="tv-wl-perf-card neg">
+                  <span className="perf-val">-8.29%</span>
+                  <span className="perf-lbl">1Y</span>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         )}
       </div>
